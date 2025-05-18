@@ -1,5 +1,6 @@
 #code chức năng
 import copy
+import ChuanTac_ChinhTac
 """
 equation = [
     [0, -1, 1, 4, -4],
@@ -22,13 +23,14 @@ equation = [
     [1, 1, -1]
 ]
 """
-
-equation = [
-    [0 ,-4, -5],
-    [9, -2, -2],
-    [4, -1, 0],
-    [3, 0, -1]
-]
+s = """min -x1 + x2
+-x1 -2x2 <= 6
+x1 - 2x2 <= 4
+-x1 + x2 <= 1
+x1 <=0
+x2 <= 0"""
+ChuanTac_ChinhTac.inputStringProcessing(s);
+equation = ChuanTac_ChinhTac.returnFormToSolveSimplex();
 
 #Dieu kien dau vao
 condition = "min"
@@ -251,9 +253,7 @@ def solveBland(equation, condition):
         print(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
         print("-------------------------------------")
         symplex = rotate(symplex, min_indexGetMin, min_indexGetDivine)
-        printEquation(symplex)
-solveBland(equation, condition)
-    
+        printEquation(symplex)    
             
 
             
