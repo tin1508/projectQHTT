@@ -151,15 +151,16 @@ def plot_feasible_region(constraints, vertices, optimal_points, is_infinite, is_
     plt.legend()
     plt.show()
 
-# ======== Hàm solve để hiển thị hình và giải nghiệm ========
+# ======== Hàm main chạy từ dòng lệnh ========
 
 def solve(aimText, constraintText):
     objective_str = aimText.strip()
-    s = constraintText.strip().split('\n')
+    constraintText = constraintText.split('\n')
     constraint_lines = []
-    for line in s:
-        if line.strip():
-            constraint_lines.append(line.strip())
+    for line in constraintText:
+        if not line.strip():
+            break
+        constraint_lines.append(line.strip())
 
     # Parse objective
     match = re.match(r"^(max|min)\s+([-+]?\s*\d*\.?\d*)?x1\s*([-+])\s*([-+]?\s*\d*\.?\d*)?x2$", objective_str, re.IGNORECASE)
@@ -278,8 +279,16 @@ def solve(aimText, constraintText):
     result_text += "\n\nTất cả các đỉnh và Z tương ứng:\n" + "\n".join([
         f"({x1:.2f}, {x2:.2f}) -> Z = {val:.2f}" for (x1, x2), val in zip(vertices, values)
     ])
+    print(result_text)
     result = solve_linear_programming(constraints, c, objective)
     optimal_value, optimal_points, vertices, values, is_infinite, optimal_points, is_unbounded, unbounded_points = result
 
     plot_feasible_region(constraints, vertices, optimal_points, is_infinite, is_unbounded, unbounded_points, c, objective)
-    return result_text
+if __name__ == "__main__":
+    aimText = "min -x1 + x2"
+    constraintText = """-x1 -2x2 <= 6
+                x1 - 2x2 <= 4
+                -x1 + x2 <= 1
+                x1 <=0 
+                x2 <= 0"""
+    solve(aimText, constraintText)
