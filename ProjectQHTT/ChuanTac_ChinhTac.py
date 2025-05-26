@@ -2,19 +2,22 @@
 import re
 
 def reset():
-    global c, A, B, X, compare, firstWord, linesProcessing, freeVar, negativeVar
+    global c, A, B, X, compare, firstWord, linesProcessing, freeVar, negativeVar, originFirstWord
     c = [] 
     A = [] #lưu các hệ số của các ràng buộc
     B = [] #lưu các số bên phải phép so sánh
     X = [] #lưu các biến 
     compare = [] #lưu các phép so sánh
     firstWord = '' #lưu xem hàm mục tiêu là max hay min
+    originFirstWord = '' #dùng để lưu min hay max ban đầu để xử lý đơn hình
     linesProcessing = []
     freeVar = []
     negativeVar = []
 
+
+
 def inputStringProcessing(s):
-    global c, A, B, X, compare, firstWord, linesProcessing, freeVar, negativeVar
+    global c, A, B, X, compare, firstWord, linesProcessing, freeVar, negativeVar, originFirstWord
     reset()
     lines = s.split('\n')
     #xử lý trường hợp nếu người dùng nhập vào 1 chuỗi rỗng
@@ -34,6 +37,7 @@ def inputStringProcessing(s):
             linesProcessing.append(cutStr)
     firstLine = linesProcessing[0]
     firstWord = (firstLine.split())[0]
+    originFirstWord = firstWord
     linesProcessing[0] = (linesProcessing[0].replace(firstWord, '')).strip()
 
     boundedVars = set()
@@ -272,19 +276,3 @@ def returnFormToSolveSimplexAndBland():
         newResult.append(temp2)
     return newResult
 
-if __name__ == "__main__":
-    print("Enter a string:")
-    s = ""
-    while True:
-        line = input()
-        if line == "":
-            break
-        s += line + "\n"
-    inputStringProcessing(s)
-    changeIntoStandardForm()
-    print(negativeVar)
-    print(freeVar)
-    print(c)
-    print(newA)
-    print(newB)
-    #print(changeIntoAugmentedForm())

@@ -8,7 +8,7 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import ChuanTac_ChinhTac
 import HinhHoc_ToaDo
-import DonHinh_Bland
+import DonHinh_Bland_2Pha
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -75,7 +75,6 @@ class Ui_MainWindow(object):
         self.methodComboBox.addItems([
             "Chọn phương pháp",
             "Phương pháp Hình học (cho 2 biến, dùng tọa độ)",
-            "Phương pháp Hình học (cho 2 biến, dùng trượt)",
             "Phương pháp Đơn hình",
             "Phương pháp Bland",
             "Phương pháp Hai pha"
@@ -119,17 +118,6 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.outputGroupBox, 7)
         self.verticalLayout.addLayout(self.horizontalLayout)
 
-        # # Biểu đồ
-        # self.figure = Figure(figsize=(7, 5))
-        # self.canvas = FigureCanvas(self.figure)
-        # self.canvas.setMinimumHeight(400)
-        # self.outputSplitter.addWidget(self.canvas)
-
-        # # Thêm splitter vào layout
-        # self.outputLayout.addWidget(self.outputSplitter)
-
-        # self.horizontalLayout.addWidget(self.outputGroupBox, 7)
-
         MainWindow.setCentralWidget(self.centralwidget)
 
         self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
@@ -147,18 +135,19 @@ class Ui_MainWindow(object):
         self.canonicalizeButton.clicked.connect(self.convertToAugmentedForm)
         self.solveButton.clicked.connect(self.solveProblemBySolutions)
 
-        self._setup_empty_plot()
+        self.SetUpEmptyPlot()
 
-    def _setup_empty_plot(self):
-        ax = self.figure.add_subplot(111)
-        ax.clear()
-        ax.set_xlim(-10, 10)
-        ax.set_ylim(-10, 10)
-        ax.set_xlabel("x1", fontsize=12, labelpad=15)  # Tăng khoảng cách nhãn
-        ax.set_ylabel("x2", fontsize=12, labelpad=15)  # Tăng khoảng cách nhãn
-        ax.grid(True)
+    def SetUpEmptyPlot(self):
+        self.figure.clear()
+        axes = self.figure.add_subplot(111)
+        axes.clear()
+        axes.set_xlim(-10, 10)
+        axes.set_ylim(-10, 10)
+        axes.set_xlabel("x1", fontsize=12, labelpad=15)  # Tăng khoảng cách nhãn
+        axes.set_ylabel("x2", fontsize=12, labelpad=15)  # Tăng khoảng cách nhãn
         self.figure.tight_layout(pad=2.0)  # Tự động điều chỉnh khoảng cách
         self.canvas.draw()
+        return axes
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
@@ -175,49 +164,52 @@ class Ui_MainWindow(object):
         self.solveButton.setText(_translate("MainWindow", "Giải"))
         self.outputGroupBox.setTitle(_translate("MainWindow", "Kết quả"))
 
+    #Phần nhúng chức năng vào
     #nhận chuỗi đầu vào từ người nhập
     def receiveInputFromUser(self):
-        aimText = self.objectiveLineEdit.text();
-        constraintText = self.constraintsPlainTextEdit.toPlainText();
-        return aimText + '\n' + constraintText;
-
+        aimText = self.objectiveLineEdit.text()
+        constraintText = self.constraintsPlainTextEdit.toPlainText()
+        return aimText + '\n' + constraintText
     #chức năng
     #chuyển bài toán sang dạng chuẩn tắc 
     def converToStandardForm(self):
-        s = self.receiveInputFromUser();
+        s = self.receiveInputFromUser()
         #xử lý chuỗi đầu vào
-        ChuanTac_ChinhTac.inputStringProcessing(s);
-        result = ChuanTac_ChinhTac.changeIntoStandardForm();
-        self.resultTextEdit.setText("Dạng chuẩn tắc: " + '\n' + result);
+        ChuanTac_ChinhTac.inputStringProcessing(s)
+        result = ChuanTac_ChinhTac.changeIntoStandardForm()
+        self.resultTextEdit.setText("Dạng chuẩn tắc: " + '\n' + result)
     #chuyển bài toán sang dạng chính tắc
     def convertToAugmentedForm(self):
-        s = self.receiveInputFromUser();
+        s = self.receiveInputFromUser()
         #xử lý chuỗi đầu vào
-        ChuanTac_ChinhTac.inputStringProcessing(s);
-        result = ChuanTac_ChinhTac.changeIntoAugmentedForm();
-        self.resultTextEdit.setText("Dạng chính tắc: " + '\n' + result);
-    #giải bài toán bằng phương pháp hình học
-
+        ChuanTac_ChinhTac.inputStringProcessing(s)
+        result = ChuanTac_ChinhTac.changeIntoAugmentedForm()
+        self.resultTextEdit.setText("Dạng chính tắc: " + '\n' + result)
+    #các phương pháp giải bài toán quy hoạch tuyến tính chuẩn
     def solveProblemBySolutions(self):
         self.resultTextEdit.clear()
         method = self.methodComboBox.currentText()
         #Phương pháp hình học tọa độ
         if method == "Phương pháp Hình học (cho 2 biến, dùng tọa độ)":
-            self.solveByGeometrySolution()
-        elif method ==  "Phương pháp Hình học (cho 2 biến, dùng trượt)":
-            return;
-        #Phương pháp đơn hình
-        elif method == "Phương pháp Đơn hình" or method == "Phương pháp Bland":
+            aimText = self.objectiveLineEdit.text()
+            constraintText = self.constraintsPlainTextEdit.toPlainText()
+            axes = self.SetUpEmptyPlot()
+            HinhHoc_ToaDo.solve(aimText, constraintText, outputCall= self.outputCall, axes = axes, canvas = self.canvas)
+            self.canvas.draw()
+        #Phương pháp đơn hình, bland, 2 pha
+        elif method == "Phương pháp Đơn hình" or method == "Phương pháp Bland" or method == "Phương pháp Hai pha":
             s = self.receiveInputFromUser()
             ChuanTac_ChinhTac.inputStringProcessing(s)
             equation = ChuanTac_ChinhTac.returnFormToSolveSimplexAndBland()
-            condition = "min"
+            condition = ChuanTac_ChinhTac.originFirstWord
             if method == "Phương pháp Đơn hình":
-                DonHinh_Bland.solveSymplex(equation, condition, outputCall= self.outputCall)
+                DonHinh_Bland_2Pha.solveSymplex(equation, condition, outputCall = self.outputCall)
+            elif method == "Phương pháp Bland" :
+                DonHinh_Bland_2Pha.solveBland(equation, condition, outputCall = self.outputCall)            
             else:
-                DonHinh_Bland.solveBland(equation, condition, outputCall = self.outputCall)
-        elif method == "Phương pháp Hai pha":
-            return;
+                DonHinh_Bland_2Pha.solveTwoPhaseSymplex(equation, condition, outputCall = self.outputCall)
+        else:
+            self.resultTextEdit.setPlainText("Vui lòng chọn phương pháp giải!!!!");
     #hàm này dùng để in kết quả đơn hình, bland, 2 pha ra result text
     #cách sử dụng giống print() nhưng print chỉ in được trên console, còn outputCall này là 1 hàm mình tự định nghĩa để giúp in ra trên màn hình app
     def outputCall(self, text):

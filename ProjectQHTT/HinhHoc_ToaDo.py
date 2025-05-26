@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as ax
 from itertools import combinations
 import re
 
@@ -77,12 +77,12 @@ def is_unbounded(constraints, c, objective):
 def solve_linear_programming(constraints, c, objective):
     vertices = get_vertices(constraints)
     if len(vertices) == 0:
-        # Vẫn gọi plot_feasible_region sau
-        return "Miền nghiệm rỗng", None, np.array([]), None, False, [], False, None
+        # Vẫn gọi plotFeasibleRegion sau
+        return "Vô Nghiệm", None, np.array([]), None, False, [], False, None
     
     is_unb, unbounded_points = is_unbounded(constraints, c, objective)
     if is_unb:
-        return "Vô nghiệm (Miền nghiệm không bị chặn)", None, vertices, None, False, [], True, unbounded_points
+        return "Bài toán không giới nội", None, vertices, None, False, [], True, unbounded_points
 
     values = evaluate_objective(vertices, c)
     is_inf, optimal_points = is_infinite_solutions(vertices, values, c, constraints, objective)
@@ -94,66 +94,64 @@ def solve_linear_programming(constraints, c, objective):
 
 # ======== Hàm vẽ miền nghiệm và in kết quả ========
 
-def plot_feasible_region(constraints, vertices, optimal_points, is_infinite, is_unbounded, unbounded_points, c, objective):
-    plt.figure(figsize=(8, 6))
+def plotFeasibleRegion(constraints, vertices, optimal_points, is_infinite, is_unbounded, unbounded_points, c, objective, axes, canvas):
+    axes.clear()
     x1 = np.linspace(-15, 15, 400)
 
     # Luôn vẽ các đường ràng buộc
     for a, b, d, op in constraints:
         if b != 0:
             x2 = (d - a * x1) / b
-            plt.plot(x1, x2, label=f"{a}x1 + {b}x2 {op} {d}")
+            axes.plot(x1, x2, label=f"{a}x1 + {b}x2 {op} {d}")
         else:
             x = d / a
-            plt.axvline(x, label=f"{a}x1 {op} {d}")
+            axes.axvline(x, label=f"{a}x1 {op} {d}")
 
-    # Nếu không có đỉnh hợp lệ => miền nghiệm rỗng
+    # Nếu không có miền chấp nhận được => vô nghiệm
     if len(vertices) == 0:
-        plt.title("Miền nghiệm rỗng")
+        axes.set_title("Vô nghiệm")
     else:
         # Vẽ miền nghiệm
         hull = vertices[np.argsort(np.arctan2(vertices[:, 1] - vertices[:, 1].mean(),
                                               vertices[:, 0] - vertices[:, 0].mean()))]
-        plt.fill(hull[:, 0], hull[:, 1], 'lightblue', alpha=0.5, label="Miền nghiệm khả thi")
-        plt.plot(vertices[:, 0], vertices[:, 1], 'ro', label="Đỉnh")
+        axes.fill(hull[:, 0], hull[:, 1], 'lightblue', alpha=0.5, label="Miền nghiệm khả thi")
+        axes.plot(vertices[:, 0], vertices[:, 1], 'ro', label="Đỉnh")
 
         if is_unbounded:
-            plt.title("Miền nghiệm không bị chặn")
+            axes.set_title("Bài toán không giới nội")
             if unbounded_points is not None and len(unbounded_points) > 0:
-                plt.plot(unbounded_points[:, 0], unbounded_points[:, 1], 'y.', alpha=0.5)
+                axes.plot(unbounded_points[:, 0], unbounded_points[:, 1], 'y.', alpha=0.5)
             grad = np.array(c) / np.linalg.norm(c) * 5
             if objective == "max":
-                plt.arrow(0, 0, grad[0], grad[1], color='purple', width=0.1)
+                axes.arrow(0, 0, grad[0], grad[1], color='purple', width=0.1)
             else:
-                plt.arrow(0, 0, -grad[0], -grad[1], color='purple', width=0.1)
+                axes.arrow(0, 0, -grad[0], -grad[1], color='purple', width=0.1)
 
         elif is_infinite and optimal_points:
             opt_array = np.array(optimal_points)
             if len(opt_array) >= 2:
                 opt_array = opt_array[np.lexsort((opt_array[:, 1], opt_array[:, 0]))]
-                plt.plot(opt_array[:, 0], opt_array[:, 1], 'k-', linewidth=3, label="Đoạn nghiệm tối ưu (vô số)", zorder=5)
-                plt.plot(opt_array[:, 0], opt_array[:, 1])
+                axes.plot(opt_array[:, 0], opt_array[:, 1], 'k-', linewidth=3, label="Đoạn nghiệm tối ưu (vô số)", zorder=5)
+                axes.plot(opt_array[:, 0], opt_array[:, 1])
             else:
-                plt.plot(opt_array[:, 0], opt_array[:, 1], 'go', label="Điểm tối ưu (vô số)")
-            plt.title("Vô số nghiệm")
+                axes.plot(opt_array[:, 0], opt_array[:, 1], 'go', label="Điểm tối ưu (vô số)")
+            axes.set_title("Vô số nghiệm")
 
         elif optimal_points:
             opt_array = np.array(optimal_points)
-            plt.plot(opt_array[:, 0], opt_array[:, 1], 'g*', markersize=12, label="Điểm tối ưu")
-            plt.title("Miền nghiệm và điểm tối ưu")
+            axes.plot(opt_array[:, 0], opt_array[:, 1], 'g*', markersize=12, label="Điểm tối ưu")
+            axes.set_title("Miền nghiệm và điểm tối ưu")
 
     # Trục, lưới, nhãn
-    plt.axhline(0, color='black', linewidth=0.5)
-    plt.axvline(0, color='black', linewidth=0.5)
-    plt.xlabel("x1")
-    plt.ylabel("x2")
-    plt.grid(True)
-    plt.legend()
-    plt.show()
+    axes.axhline(0, color='black', linewidth=0.5)
+    axes.axvline(0, color='black', linewidth=0.5)
+    axes.legend()
+    axes.grid(True)
+    canvas.draw()
 
 # ======== Hàm main chạy từ dòng lệnh ========
 
-def solve(aimText, constraintText):
+def solve(aimText, constraintText, outputCall, axes, canvas):
     objective_str = aimText.strip()
     constraintText = constraintText.split('\n')
     constraint_lines = []
@@ -165,7 +163,7 @@ def solve(aimText, constraintText):
     # Parse objective
     match = re.match(r"^(max|min)\s+([-+]?\s*\d*\.?\d*)?x1\s*([-+])\s*([-+]?\s*\d*\.?\d*)?x2$", objective_str, re.IGNORECASE)
     if not match:
-        print("Hàm mục tiêu không hợp lệ.")
+        outputCall("Hàm mục tiêu không hợp lệ.")
         return
 
     objective = match.group(1).lower()
@@ -251,14 +249,14 @@ def solve(aimText, constraintText):
             d = float(match_x2.group(3))
             constraints.append([a, b, d, op])
         else:
-            print(f"Ràng buộc không hợp lệ: {line}")
+            outputCall(f"Ràng buộc không hợp lệ: {line}")
             return
 
     result, optimal_points, vertices, values, is_infinite, _, is_unbounded, unbounded_points = solve_linear_programming(constraints, c, objective)
 
-    if result == "Miền nghiệm rỗng":
-        print(result)
-        plot_feasible_region(constraints, vertices, [], False, False, None, c, objective)
+    if result == "Vô Nghiệm":
+        outputCall(result)
+        plotFeasibleRegion(constraints, vertices, [], False, False, None, c, objective, axes, canvas)
         return
 
 
@@ -279,16 +277,9 @@ def solve(aimText, constraintText):
     result_text += "\n\nTất cả các đỉnh và Z tương ứng:\n" + "\n".join([
         f"({x1:.2f}, {x2:.2f}) -> Z = {val:.2f}" for (x1, x2), val in zip(vertices, values)
     ])
-    print(result_text)
+    outputCall(result_text)
     result = solve_linear_programming(constraints, c, objective)
     optimal_value, optimal_points, vertices, values, is_infinite, optimal_points, is_unbounded, unbounded_points = result
 
-    plot_feasible_region(constraints, vertices, optimal_points, is_infinite, is_unbounded, unbounded_points, c, objective)
-if __name__ == "__main__":
-    aimText = "min -x1 + x2"
-    constraintText = """-x1 -2x2 <= 6
-                x1 - 2x2 <= 4
-                -x1 + x2 <= 1
-                x1 <=0 
-                x2 <= 0"""
-    solve(aimText, constraintText)
+    plotFeasibleRegion(constraints, vertices, optimal_points, is_infinite, is_unbounded, unbounded_points, c, objective, axes, canvas)
+

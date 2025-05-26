@@ -1,50 +1,6 @@
 #code chức năng
 import copy
-import ChuanTac_ChinhTac
-"""
-equation = [
-    [0, -1, 1, 4, -4],
-    [6, 3, -3, -1, 1],
-    [4, -1, 1, -2, 2],
-    [1, 1, -1, 0, 0],
-    [3, 0, 0, 1, -1]
-]
-"""
-
-equation = [
-    [0, 1, 2],
-    [-2, 1, -1],
-    [-4, 1, 2],
-    [2, 0, -1]
-]
-"""
-equation = [
-    [0, -1, -2],
-    [1, 1, -1],
-]
-"""
-"""
-equation = [
-    [0, -1, -2],
-    [6, -1, -2],
-    [1, 1, -1]
-]
-"""
-"""
-s = min -x1 + x2
--x1 -2x2 <= 6
-x1 - 2x2 <= 4
--x1 + x2 <= 1
-x1 <=0
-x2 <= 0
-
-ChuanTac_ChinhTac.inputStringProcessing(s);
-equation = ChuanTac_ChinhTac.returnFormToSolveSimplex();
-print(s)
-print(equation)
-"""
 #Dieu kien dau vao
-condition = "min"
 def getSymplex(equation, condition):
     size_col = len(equation[0])
     size_row = len(equation)
@@ -66,7 +22,8 @@ def getSymplex(equation, condition):
         ]
     }
     return symplex
-def printEquation(symplex):
+def returnEquation(symplex):
+    result = []
     variables = symplex["Variable"]
     for eq in symplex["Equation"]:
         left = eq["Left"]
@@ -87,7 +44,8 @@ def printEquation(symplex):
                 else:
                     terms.append(f"{sign} {coef_abs:.2f}{var}")
         rhs = " ".join(terms)
-        print(f"{left} = {b:.2f}{' ' + rhs if rhs else ''}")
+        result.append(f"{left} = {b:.2f}{' ' + rhs if rhs else ''}")
+    return '\n'.join(result)
 
 def findMinVariable(symplex):
     equation = symplex["Equation"][0]["Right"]
@@ -108,11 +66,11 @@ def findMinDivine(symplex, min_indexGetMin):
         return None
     min_row = min(result, key=lambda x: x[1])[0]
     return min_row
-def ifinitySolution(symplex):
+def ifinitySolution(symplex, outputCall):
     Right = symplex["Equation"][0]["Right"]
     for i in range(1, len(Right)):
         if Right[i] == 0 :
-            print(f"Boi vi he so {symplex["Variable"][i]}","=", f"{Right[i]:.0f}")
+            outputCall(f"Boi vi he so {symplex["Variable"][i]} = {Right[i]:.0f}")
             variables = symplex["Variable"]
             index = symplex["Equation"][0]["Right"].index(0)
             symplex["Variable"].pop(index)
@@ -120,7 +78,7 @@ def ifinitySolution(symplex):
                 eq["Right"].pop(index)
             for i in range(1, len(symplex["Equation"][0]["Right"])):
                 symplex["Equation"][0]["Right"][i] = 0
-            printEquation(symplex)
+            outputCall(returnEquation(symplex))
             #Xu ly dau
             size_col = len(symplex["Equation"][0]["Right"])
             if size_col == 2:
@@ -130,10 +88,10 @@ def ifinitySolution(symplex):
                     right = eq["Right"]
                     b = right[0]
                     if right[1] > 0:
-                        print(f"{variables[1]} >= {-b/right[1]}")
+                        outputCall(f"{variables[1]} >= {-b/right[1]}")
                     else:
                         if right[1] < 0:
-                            print(f"{variables[1]} <= {-b/-right[1]}")
+                            outputCall(f"{variables[1]} <= {-b/-right[1]}")
             return True
     return False
 def unboundedSolution(symplex, min_indexGetMin):
@@ -174,44 +132,44 @@ def rotate(symplex, min_indexGetMin, min_indexGetDivine):
             symplex["Equation"][i]["Right"][min_indexGetMin] = num/pivot_element
     updateLabel(symplex, min_indexGetMin, min_indexGetDivine)
     return symplex
-def result(symplex, condition):
+def result(symplex, condition, outputCall):
     size_row = len(symplex["Equation"])
     size_col = len(symplex["Equation"][0]["Right"])
     for i in range(size_row):
         if symplex["Equation"][i]["Left"] == "z" and condition == "max":
-            print(symplex["Equation"][i]["Left"] + ":", f"{-symplex["Equation"][i]["Right"][0]:.2f}")
+            outputCall(f"{symplex["Equation"][i]["Left"]} : {-symplex["Equation"][i]["Right"][0]:.2f}")
         else:
-            print(symplex["Equation"][i]["Left"] + ":", f"{symplex["Equation"][i]["Right"][0]:.2f}")
+            outputCall(f"{symplex["Equation"][i]["Left"]} : {symplex["Equation"][i]["Right"][0]:.2f}")
     for i in range(1, size_col):
-        print(symplex["Variable"][i] + ":", 0)
+        outputCall(f"{symplex["Variable"][i]} : {0}")
 
 #Symplex
-def solveSymplex(equation, condition):
-    print("Symplex")
+def solveSymplex(equation, condition, outputCall):
+    outputCall("Symplex")
     symplex = getSymplex(equation, condition)
-    printEquation(symplex)
+    outputCall(returnEquation(symplex))
     while True:
-        if ifinitySolution(symplex):
-            print("Infinity Solution")
+        if ifinitySolution(symplex, outputCall):
+            outputCall("Infinity Solution")
             break
         if stopSymplex(symplex):
-            print("Unique solution")
-            result(symplex, condition)
+            outputCall("Unique solution")
+            result(symplex, condition, outputCall)
             break
         min_indexGetMin = findMinVariable(symplex)
         min_indexGetDivine = findMinDivine(symplex, min_indexGetMin)
         if unboundedSolution(symplex, min_indexGetMin):
-            print("Unbounded Solution")
+            outputCall("Unbounded Solution")
             if symplex["Condition"] == "min":
-                print(f"z = {float('-inf')}")
+                outputCall(f"z = {float('-inf')}")
             else:
-                print(f"z = {float('inf')}")
+                outputCall(f"z = {float('inf')}")
             break
-        print(f"Bien dau vao: {symplex["Variable"][min_indexGetMin]}")
-        print(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
-        print("-------------------------------------")
+        outputCall(f"Bien dau vao: {symplex["Variable"][min_indexGetMin]}")
+        outputCall(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
+        outputCall("-------------------------------------")
         symplex = rotate(symplex, min_indexGetMin, min_indexGetDivine)
-        printEquation(symplex)
+        outputCall(returnEquation(symplex))
 #Bland
 def findMinVariableBland(symplex):
     equation = symplex["Equation"][0]["Right"]
@@ -229,32 +187,32 @@ def findMinVariableBland(symplex):
     if w_indices:
         return min(w_indices)
     return None
-def solveBland(equation, condition):
-    print("Bland")
+def solveBland(equation, condition, outputCall):
+    outputCall("Bland")
     symplex = getSymplex(equation, condition)
-    printEquation(symplex)
+    outputCall(returnEquation(symplex))
     while True:
-        if ifinitySolution(symplex):
-            print("Infinity Solution")
+        if ifinitySolution(symplex, outputCall):
+            outputCall("Infinity Solution")
             break
         if stopSymplex(symplex):
-            print("Unique solution")
-            result(symplex, condition)
+            outputCall("Unique solution")
+            result(symplex, condition, outputCall)
             break
         min_indexGetMin = findMinVariableBland(symplex)
         min_indexGetDivine = findMinDivine(symplex, min_indexGetMin)
         if unboundedSolution(symplex, min_indexGetMin):
-            print("Unbounded Solution")
+            outputCall("Unbounded Solution")
             if symplex["Condition"] == "min":
-                print(f"z = {float('-inf')}")
+                outputCall(f"z = {float('-inf')}")
             else:
-                print(f"z = {float('inf')}")
+                outputCall(f"z = {float('inf')}")
             break
-        print(f"Bien dau vao: {symplex["Variable"][min_indexGetMin]}")
-        print(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
-        print("-------------------------------------")
+        outputCall(f"Bien dau vao: {symplex["Variable"][min_indexGetMin]}")
+        outputCall(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
+        outputCall("-------------------------------------")
         symplex = rotate(symplex, min_indexGetMin, min_indexGetDivine)
-        printEquation(symplex)
+        outputCall(returnEquation(symplex))
 #Phase One
 def subscript_to_int(subscript_str):
     # Bảng chuyển ký tự subscript sang số thường
@@ -307,12 +265,12 @@ def getPhaseOne(equation, condition):
         ]
     }
     return symplex
-def solveTwoPhaseSymplex(equation, condition):
+def solveTwoPhaseSymplex(equation, condition, outputCall):
     size_col = len(equation[0])
     size_row = len(equation)
     copy_symplex = copy.deepcopy(equation[0])
     symplex = getPhaseOne(equation, condition)
-    printEquation(symplex)
+    outputCall(returnEquation(symplex))
     #min_indexGetMin
     min_indexGetMin = size_col
     #min_indexGetDivinea
@@ -323,13 +281,13 @@ def solveTwoPhaseSymplex(equation, condition):
         b = Right[0]
         if b < 0:
             resultIndex.append((i,b))
-    min_indexGetDivine = min(resultIndex, key=lambda x: x[1])[0]
-    print(min_indexGetDivine)
-    print(f"Bien dau vao: {symplex["Variable"][min_indexGetMin]}")
-    print(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
-    print("-------------------------------------")
+    min_indexGetDivine = min(resultIndex, key=lambda x: x[1][0])
+    outputCall(min_indexGetDivine)
+    outputCall(f"Bien dau vao: {symplex["Variable"][min_indexGetMin]}")
+    outputCall(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
+    outputCall("-------------------------------------")
     symplex = rotate(symplex, min_indexGetMin, min_indexGetDivine)
-    printEquation(symplex)
+    outputCall(returnEquation(symplex))
     while True:
         Right = symplex["Equation"][0]["Right"]
         check = False
@@ -381,41 +339,41 @@ def solveTwoPhaseSymplex(equation, condition):
                 for eq in symplex["Equation"]:
                     eq["Right"].pop(indexX0)
                 #Phase Two
-                print("Phase Two")
-                print("Symplex")
-                printEquation(symplex)
+                outputCall("Phase Two")
+                outputCall("Symplex")
+                outputCall(returnEquation(symplex))
                 while True:
-                    if ifinitySolution(symplex):
-                        print("Infinity Solution")
+                    if ifinitySolution(symplex, outputCall):
+                        outputCall("Infinity Solution")
                         break
                     if stopSymplex(symplex):
-                        print("Unique solution")
-                        result(symplex, condition)
+                        outputCall("Unique solution")
+                        result(symplex, condition, outputCall)
                         break
                     min_indexGetMin = findMinVariable(symplex)
                     min_indexGetDivine = findMinDivine(symplex, min_indexGetMin)
                     if unboundedSolution(symplex, min_indexGetMin):
-                        print("Unbounded Solution")
+                        outputCall("Unbounded Solution")
                         if symplex["Condition"] == "min":
-                            print(f"z = {float('-inf')}")
+                            outputCall(f"z = {float('-inf')}")
                         else:
-                            print(f"z = {float('inf')}")
+                            outputCall(f"z = {float('inf')}")
                         break
-                    print(f"Bien dau vao: {symplex["Variable"][min_indexGetMin]}")
-                    print(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
-                    print("-------------------------------------")
+                    outputCall(f"Bien dau vao: {symplex["Variable"][min_indexGetMin]}")
+                    outputCall(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
+                    outputCall("-------------------------------------")
                     symplex = rotate(symplex, min_indexGetMin, min_indexGetDivine)
-                    printEquation(symplex)
+                    outputCall(returnEquation(symplex))
             else:
-                print("Vo nghiem")
+                outputCall("Vo nghiem")
             break
         min_indexGetMin = findMinVariable(symplex)
         min_indexGetDivine = findMinDivine(symplex, min_indexGetMin)
-        print(f"Bien dau vao: {symplex["Variable"][min_indexGetMin]}")
-        print(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
-        print("-------------------------------------")
+        outputCall(f"Bien dau vao: {symplex["Variable"][min_indexGetMin]}")
+        outputCall(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
+        outputCall("-------------------------------------")
         symplex = rotate(symplex, min_indexGetMin, min_indexGetDivine)
-        printEquation(symplex)
+        outputCall(returnEquation(symplex))
     return symplex
 
             
