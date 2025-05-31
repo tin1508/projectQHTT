@@ -172,6 +172,7 @@ class Ui_MainWindow(object):
         aimText = self.objectiveLineEdit.text()
         constraintText = self.constraintsPlainTextEdit.toPlainText()
         s = aimText + '\n' + constraintText
+        return s
     #chức năng
     #chuyển bài toán sang dạng chuẩn tắc 
     def converToStandardForm(self):

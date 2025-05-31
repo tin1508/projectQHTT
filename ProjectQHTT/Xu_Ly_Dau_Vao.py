@@ -25,6 +25,7 @@ def inputStringProcessing(s):
         lines[i] = re.sub(r'([^\s])([+-])', r'\1 \2', lines[i])
         #Đảm bảo luôn có khoảng trắng giữa biến và dấu so sánh
         lines[i] = re.sub(r'(<=|>=|=)(\w+)', r'\1 \2', lines[i])
+        lines[i] = re.sub(r'(\w+)(<=|>=|=)', r'\1 \2', lines[i])
     #tách ra từng phân tử trong 1 mảng để xử lý
     for line in lines:
         cutStr = line.strip()
@@ -90,17 +91,6 @@ def inputStringProcessing(s):
     for var in X:
         if var not in constrainedVars:
             freeVar.append(var)
-# if __name__ == "__main__":
-#     s = """
-#     max 2x1 - 6x2 
-#     -x1 - x2 - x3 <= -2
-#     2x1 - x2 + x3 <= 1
-#     x1 >= 0
-#     x2 >= 0
-#     x3 >= 0
-#     """
-#     inputStringProcessing(s)
-#     print(linesProcessing)
-#     print(B)
+
 
 

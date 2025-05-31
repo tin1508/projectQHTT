@@ -84,9 +84,9 @@ def changeIntoStandardForm():
             if newA[i][j] == 0: continue
             if newA[i][j] > 0 and temp2 != '':
                 temp2 = temp2 + '+ ' + str(newA[i][j]) + varName + ' ' 
-            elif(newA[i][j] > 0 and temp2 == ''):
+            elif newA[i][j] > 0 and temp2 == '':
                 temp2 = temp2 + str(newA[i][j]) + varName + ' ' 
-            elif A[i][j] < 0 and j > 0:
+            elif newA[i][j] < 0 and j > 0:
                 temp2 = temp2 + str(newA[i][j])[:1] + ' ' + str(newA[i][j])[1:] + varName + ' '
             else:
                 temp2 = temp2 + str(newA[i][j]) + varName + ' '
