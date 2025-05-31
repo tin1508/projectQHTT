@@ -6,7 +6,9 @@ from PyQt6.QtCore import Qt, QTimer
 from PyQt6.QtGui import QPixmap
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-import ChuanTac_ChinhTac
+import Xu_Ly_Dau_Vao
+import Chuan_Tac
+import Chinh_Tac
 import HinhHoc_ToaDo
 import DonHinh_Bland_2Pha
 
@@ -169,21 +171,21 @@ class Ui_MainWindow(object):
     def receiveInputFromUser(self):
         aimText = self.objectiveLineEdit.text()
         constraintText = self.constraintsPlainTextEdit.toPlainText()
-        return aimText + '\n' + constraintText
+        s = aimText + '\n' + constraintText
     #chức năng
     #chuyển bài toán sang dạng chuẩn tắc 
     def converToStandardForm(self):
         s = self.receiveInputFromUser()
         #xử lý chuỗi đầu vào
-        ChuanTac_ChinhTac.inputStringProcessing(s)
-        result = ChuanTac_ChinhTac.changeIntoStandardForm()
+        Xu_Ly_Dau_Vao.inputStringProcessing(s)
+        result = Chuan_Tac.changeIntoStandardForm()
         self.resultTextEdit.setText("Dạng chuẩn tắc: " + '\n' + result)
     #chuyển bài toán sang dạng chính tắc
     def convertToAugmentedForm(self):
         s = self.receiveInputFromUser()
         #xử lý chuỗi đầu vào
-        ChuanTac_ChinhTac.inputStringProcessing(s)
-        result = ChuanTac_ChinhTac.changeIntoAugmentedForm()
+        Xu_Ly_Dau_Vao.inputStringProcessing(s)
+        result = Chinh_Tac.changeIntoAugmentedForm()
         self.resultTextEdit.setText("Dạng chính tắc: " + '\n' + result)
     #các phương pháp giải bài toán quy hoạch tuyến tính chuẩn
     def solveProblemBySolutions(self):
@@ -199,9 +201,9 @@ class Ui_MainWindow(object):
         #Phương pháp đơn hình, bland, 2 pha
         elif method == "Phương pháp Đơn hình" or method == "Phương pháp Bland" or method == "Phương pháp Hai pha":
             s = self.receiveInputFromUser()
-            ChuanTac_ChinhTac.inputStringProcessing(s)
-            equation = ChuanTac_ChinhTac.returnFormToSolveSimplexAndBland()
-            condition = ChuanTac_ChinhTac.originFirstWord
+            Xu_Ly_Dau_Vao.inputStringProcessing(s)
+            equation = Chuan_Tac.returnFormToSolveSimplexAndBland()
+            condition = Xu_Ly_Dau_Vao.firstWord
             if method == "Phương pháp Đơn hình":
                 DonHinh_Bland_2Pha.solveSymplex(equation, condition, outputCall = self.outputCall)
             elif method == "Phương pháp Bland" :
@@ -226,7 +228,7 @@ def showProgram():
     app = QtWidgets.QApplication(sys.argv)
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    image_path = os.path.join(script_dir, "photo.png")
+    image_path = os.path.join(script_dir, "logo.png")
 
     if not os.path.exists(image_path):
         print(f"Error: Image file not found at {image_path}")

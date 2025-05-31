@@ -1,5 +1,6 @@
 #code chức năng
 import copy
+
 #Dieu kien dau vao
 def getSymplex(equation, condition):
     size_col = len(equation[0])
@@ -150,23 +151,23 @@ def solveSymplex(equation, condition, outputCall):
     outputCall(returnEquation(symplex))
     while True:
         if ifinitySolution(symplex, outputCall):
-            outputCall("Infinity Solution")
+            outputCall("Vô số nghiệm")
             break
         if stopSymplex(symplex):
-            outputCall("Unique solution")
+            outputCall("Nghiệm duy nhất")
             result(symplex, condition, outputCall)
             break
         min_indexGetMin = findMinVariable(symplex)
         min_indexGetDivine = findMinDivine(symplex, min_indexGetMin)
         if unboundedSolution(symplex, min_indexGetMin):
-            outputCall("Unbounded Solution")
+            outputCall("Bài toán không giới nội")
             if symplex["Condition"] == "min":
                 outputCall(f"z = {float('-inf')}")
             else:
                 outputCall(f"z = {float('inf')}")
             break
-        outputCall(f"Bien dau vao: {symplex["Variable"][min_indexGetMin]}")
-        outputCall(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
+        outputCall(f"Biến đầu vào: {symplex["Variable"][min_indexGetMin]}")
+        outputCall(f"Biến đầu ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
         outputCall("-------------------------------------")
         symplex = rotate(symplex, min_indexGetMin, min_indexGetDivine)
         outputCall(returnEquation(symplex))
@@ -208,8 +209,8 @@ def solveBland(equation, condition, outputCall):
             else:
                 outputCall(f"z = {float('inf')}")
             break
-        outputCall(f"Bien dau vao: {symplex["Variable"][min_indexGetMin]}")
-        outputCall(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
+        outputCall(f"Biến đầu vào: {symplex["Variable"][min_indexGetMin]}")
+        outputCall(f"Biến đầu ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
         outputCall("-------------------------------------")
         symplex = rotate(symplex, min_indexGetMin, min_indexGetDivine)
         outputCall(returnEquation(symplex))
@@ -281,10 +282,9 @@ def solveTwoPhaseSymplex(equation, condition, outputCall):
         b = Right[0]
         if b < 0:
             resultIndex.append((i,b))
-    min_indexGetDivine = min(resultIndex, key=lambda x: x[1][0])
-    outputCall(min_indexGetDivine)
-    outputCall(f"Bien dau vao: {symplex["Variable"][min_indexGetMin]}")
-    outputCall(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
+    min_indexGetDivine = min(resultIndex, key=lambda x: x[1])[0]
+    outputCall(f"Biến đầu vào: {symplex["Variable"][min_indexGetMin]}")
+    outputCall(f"Biến đầu ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
     outputCall("-------------------------------------")
     symplex = rotate(symplex, min_indexGetMin, min_indexGetDivine)
     outputCall(returnEquation(symplex))
@@ -353,24 +353,24 @@ def solveTwoPhaseSymplex(equation, condition, outputCall):
                     min_indexGetMin = findMinVariable(symplex)
                     min_indexGetDivine = findMinDivine(symplex, min_indexGetMin)
                     if unboundedSolution(symplex, min_indexGetMin):
-                        outputCall("Unbounded Solution")
+                        outputCall("Bài toán không giới nội")
                         if symplex["Condition"] == "min":
                             outputCall(f"z = {float('-inf')}")
                         else:
                             outputCall(f"z = {float('inf')}")
                         break
-                    outputCall(f"Bien dau vao: {symplex["Variable"][min_indexGetMin]}")
-                    outputCall(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
+                    outputCall(f"Biến đầu vào: {symplex["Variable"][min_indexGetMin]}")
+                    outputCall(f"Biến đầu ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
                     outputCall("-------------------------------------")
                     symplex = rotate(symplex, min_indexGetMin, min_indexGetDivine)
                     outputCall(returnEquation(symplex))
             else:
-                outputCall("Vo nghiem")
+                outputCall("Vô nghiệm")
             break
         min_indexGetMin = findMinVariable(symplex)
         min_indexGetDivine = findMinDivine(symplex, min_indexGetMin)
-        outputCall(f"Bien dau vao: {symplex["Variable"][min_indexGetMin]}")
-        outputCall(f"Bien dau ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
+        outputCall(f"Biến đầu vào: {symplex["Variable"][min_indexGetMin]}")
+        outputCall(f"Biến đầu ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
         outputCall("-------------------------------------")
         symplex = rotate(symplex, min_indexGetMin, min_indexGetDivine)
         outputCall(returnEquation(symplex))
