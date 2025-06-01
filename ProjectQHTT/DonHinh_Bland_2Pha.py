@@ -68,8 +68,9 @@ def findMinDivine(symplex, min_indexGetMin):
     return min_row
 def ifinitySolution(symplex, outputCall):
     Right = symplex["Equation"][0]["Right"]
+    checkValue = all(value >= 0 for value in Right)
     for i in range(1, len(Right)):
-        if Right[i] == 0 :
+        if Right[i] == 0 and checkValue:
             outputCall(f"Boi vi he so {symplex["Variable"][i]} = {Right[i]:.0f}")
             variables = symplex["Variable"]
             index = symplex["Equation"][0]["Right"].index(0)
@@ -293,6 +294,7 @@ def solveTwoPhaseSymplex(equation, condition, outputCall):
     outputCall(f"Biến đầu ra: {symplex["Equation"][min_indexGetDivine]["Left"]}")
     outputCall("-------------------------------------")
     symplex = rotate(symplex, min_indexGetMin, min_indexGetDivine)
+    outputCall(returnEquation(symplex))
     while True:
         checkB = all(symplex["Equation"][i]["Right"][0] >= 0 for i in range(1, len(symplex["Equation"])))
         if  checkB and stopSymplex(symplex):
