@@ -194,16 +194,16 @@ def solveBland(equation, condition, outputCall):
     outputCall(returnEquation(symplex))
     while True:
         if ifinitySolution(symplex, outputCall):
-            outputCall("Infinity Solution")
+            outputCall("vô số nghiệm")
             break
         if stopSymplex(symplex):
-            outputCall("Unique solution")
+            outputCall("Nghiệm duy nhất")
             result(symplex, condition, outputCall)
             break
         min_indexGetMin = findMinVariableBland(symplex)
         min_indexGetDivine = findMinDivine(symplex, min_indexGetMin)
         if unboundedSolution(symplex, min_indexGetMin):
-            outputCall("Unbounded Solution")
+            outputCall("Bài toán không giới nội")
             if symplex["Condition"] == "min":
                 outputCall(f"z = {float('-inf')}")
             else:
