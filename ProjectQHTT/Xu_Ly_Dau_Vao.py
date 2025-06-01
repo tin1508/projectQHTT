@@ -95,7 +95,7 @@ def inputStringProcessing(s):
             coefs = [coefs.get(var, 0) for var in X]
             A.append(coefs)
     #Kiểm tra xem có bao nhiêu biến rồi xử lý tiếp, bài toán cần ít nhất 2 biến trở lên
-    if len(X) < 2: 
+    if len(X) < 2 or len(c) < 2: 
         strAfterProcess.append("Bài toán phải có  2 biến trở lên!!!")
         return strAfterProcess
     constrainedVars = set()
