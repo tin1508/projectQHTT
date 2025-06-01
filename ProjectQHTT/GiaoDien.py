@@ -219,7 +219,10 @@ class Ui_MainWindow(object):
                 s = self.receiveInputFromUser()
                 Xu_Ly_Dau_Vao.inputStringProcessing(s)
                 equation = Chuan_Tac.returnFormToSolveSimplexAndBland()
+                #varVec = Chuan_Tac.X
                 condition = Xu_Ly_Dau_Vao.firstWord
+                #checkBCoef = Chuan_Tac.newB
+
                 if method == "Phương pháp Đơn hình":
                     DonHinh_Bland_2Pha.solveSymplex(equation, condition, outputCall = self.outputCall)
                 elif method == "Phương pháp Bland" :

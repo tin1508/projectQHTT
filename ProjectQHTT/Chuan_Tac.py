@@ -12,6 +12,12 @@ def changeIntoStandardForm():
     freeVar = Xu_Ly_Dau_Vao.freeVar
     negativeVar = Xu_Ly_Dau_Vao.negativeVar
 
+    # Mở rộng c nếu thiếu biến
+    if len(c) < len(X):
+        # Thêm hệ số 0 cho các biến còn thiếu trong hàm mục tiêu
+        missVar = len(X) - len(c)
+        for _ in range(missVar):
+            c.append(0)
     result = []
     if firstWord == 'max':
         firstWord = '-min'
