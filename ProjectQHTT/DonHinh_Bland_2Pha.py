@@ -320,7 +320,6 @@ def solveTwoPhaseSymplex(equation, condition, outputCall):
         else:
             if value != 0:
                 checkEquation = False
-    outputCall(str(checkEquation))
     if checkEquation == True:
         index_x0 = symplex["Variable"].index("x₀")
         size_col = max(len(equation[i]) for i in range(len(equation)))
