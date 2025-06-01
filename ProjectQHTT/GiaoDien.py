@@ -3,7 +3,7 @@ import os
 from PyQt6 import QtCore, QtGui, QtWidgets
 from PyQt6.QtWidgets import QSplashScreen, QScrollArea
 from PyQt6.QtCore import Qt, QTimer
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtGui import QPixmap, QIcon
 from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import Xu_Ly_Dau_Vao
@@ -178,41 +178,53 @@ class Ui_MainWindow(object):
     def converToStandardForm(self):
         s = self.receiveInputFromUser()
         #xử lý chuỗi đầu vào
-        Xu_Ly_Dau_Vao.inputStringProcessing(s)
-        result = Chuan_Tac.changeIntoStandardForm()
-        self.resultTextEdit.setText("Dạng chuẩn tắc: " + '\n' + result)
+        checkInput = Xu_Ly_Dau_Vao.inputStringProcessing(s)
+        if len(checkInput) == 1:
+            self.resultTextEdit.setText(checkInput[0])
+        else:
+            result = Chuan_Tac.changeIntoStandardForm()
+            self.resultTextEdit.setText("Dạng chuẩn tắc: " + '\n' + result)
     #chuyển bài toán sang dạng chính tắc
     def convertToAugmentedForm(self):
         s = self.receiveInputFromUser()
         #xử lý chuỗi đầu vào
-        Xu_Ly_Dau_Vao.inputStringProcessing(s)
-        result = Chinh_Tac.changeIntoAugmentedForm()
-        self.resultTextEdit.setText("Dạng chính tắc: " + '\n' + result)
+        checkInput = Xu_Ly_Dau_Vao.inputStringProcessing(s)
+        if len(checkInput) == 1:
+            self.resultTextEdit.setText(checkInput[0])
+        else:
+            result = Chinh_Tac.changeIntoAugmentedForm()
+            self.resultTextEdit.setText("Dạng chính tắc: " + '\n' + result)
     #các phương pháp giải bài toán quy hoạch tuyến tính chuẩn
     def solveProblemBySolutions(self):
         self.resultTextEdit.clear()
         method = self.methodComboBox.currentText()
-        #Phương pháp hình học tọa độ
-        if method == "Phương pháp Hình học (cho 2 biến, dùng tọa độ)":
-            aimText = self.objectiveLineEdit.text()
-            constraintText = self.constraintsPlainTextEdit.toPlainText()
-            axes = self.SetUpEmptyPlot()
-            HinhHoc_ToaDo.solve(aimText, constraintText, outputCall= self.outputCall, axes = axes, canvas = self.canvas)
-            self.canvas.draw()
-        #Phương pháp đơn hình, bland, 2 pha
-        elif method == "Phương pháp Đơn hình" or method == "Phương pháp Bland" or method == "Phương pháp Hai pha":
-            s = self.receiveInputFromUser()
-            Xu_Ly_Dau_Vao.inputStringProcessing(s)
-            equation = Chuan_Tac.returnFormToSolveSimplexAndBland()
-            condition = Xu_Ly_Dau_Vao.firstWord
-            if method == "Phương pháp Đơn hình":
-                DonHinh_Bland_2Pha.solveSymplex(equation, condition, outputCall = self.outputCall)
-            elif method == "Phương pháp Bland" :
-                DonHinh_Bland_2Pha.solveBland(equation, condition, outputCall = self.outputCall)            
-            else:
-                DonHinh_Bland_2Pha.solveTwoPhaseSymplex(equation, condition, outputCall = self.outputCall)
+        s = self.receiveInputFromUser()
+        #xử lý chuỗi đầu vào
+        checkInput = Xu_Ly_Dau_Vao.inputStringProcessing(s)
+        if len(checkInput) == 1:
+            self.resultTextEdit.setText(checkInput[0])
         else:
-            self.resultTextEdit.setPlainText("Vui lòng chọn phương pháp giải!!!!");
+            #Phương pháp hình học tọa độ
+            if method == "Phương pháp Hình học (cho 2 biến, dùng tọa độ)":
+                aimText = self.objectiveLineEdit.text()
+                constraintText = self.constraintsPlainTextEdit.toPlainText()
+                axes = self.SetUpEmptyPlot()
+                HinhHoc_ToaDo.solve(aimText, constraintText, outputCall= self.outputCall, axes = axes, canvas = self.canvas)
+                self.canvas.draw()
+            #Phương pháp đơn hình, bland, 2 pha
+            elif method == "Phương pháp Đơn hình" or method == "Phương pháp Bland" or method == "Phương pháp Hai pha":
+                s = self.receiveInputFromUser()
+                Xu_Ly_Dau_Vao.inputStringProcessing(s)
+                equation = Chuan_Tac.returnFormToSolveSimplexAndBland()
+                condition = Xu_Ly_Dau_Vao.firstWord
+                if method == "Phương pháp Đơn hình":
+                    DonHinh_Bland_2Pha.solveSymplex(equation, condition, outputCall = self.outputCall)
+                elif method == "Phương pháp Bland" :
+                    DonHinh_Bland_2Pha.solveBland(equation, condition, outputCall = self.outputCall)            
+                else:
+                    DonHinh_Bland_2Pha.solveTwoPhaseSymplex(equation, condition, outputCall = self.outputCall)
+            else:
+                self.resultTextEdit.setPlainText("Vui lòng chọn phương pháp giải!!!!");
     #hàm này dùng để in kết quả đơn hình, bland, 2 pha ra result text
     #cách sử dụng giống print() nhưng print chỉ in được trên console, còn outputCall này là 1 hàm mình tự định nghĩa để giúp in ra trên màn hình app
     def outputCall(self, text):
@@ -223,7 +235,11 @@ class MainWindow(QtWidgets.QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.resize(1200, 800)  # Tăng kích thước cửa sổ chính
+        #Kích thước mặc định khi chạy ứng dụng
+        self.resize(1200,800)  
+        # Kích thước tối thiểu
+        self.setMinimumSize(500,400)
+        self.setWindowIcon(QIcon("logo.png"))
 
 def showProgram():
     app = QtWidgets.QApplication(sys.argv)
@@ -235,7 +251,8 @@ def showProgram():
         print(f"Error: Image file not found at {image_path}")
         sys.exit(1)
 
-    splash_pix = QPixmap(image_path)
+    original_pix = QPixmap(image_path)
+    splash_pix = original_pix.scaled(400, 400, Qt.AspectRatioMode.KeepAspectRatio, Qt.TransformationMode.SmoothTransformation)
     splash_size = splash_pix.size()
 
     splash = QSplashScreen(splash_pix, Qt.WindowType.WindowStaysOnTopHint)

@@ -69,11 +69,11 @@ def changeIntoStandardForm():
     # hàm mục tiêu
     temp1 = str(c[0]) + X[0] + ' '
     for i in range(1, len(c)):
-        if(c[i] == 0):
+        if c[i] == 0:
             continue;
-        if(c[i] > 0):
+        if c[i] > 0:
             temp1 = temp1 + '+ ' + str(c[i]) + X[i] + ' '; 
-        elif(c[i] < 0):
+        elif c[i] < 0:
             temp1 = temp1 + str(c[i])[:1] + ' ' + str(c[i])[1:] + X[i] + ' ';
     result.append(firstWord + ' ' + temp1)
     # các ràng buộc

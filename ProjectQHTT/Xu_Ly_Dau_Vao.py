@@ -16,16 +16,31 @@ def reset():
 def inputStringProcessing(s):
     global c, A, B, X, compare, firstWord, linesProcessing, freeVar, negativeVar, originFirstWord
     reset()
-    lines = s.split('\n')
-    #xử lý trường hợp nếu người dùng nhập vào 1 chuỗi rỗng
-    if not lines: return
-    # chuẩn hóa các dòng để tác dòng ví dụ: x1 + x2>=0 => x1 + x2 >= 0
+    strAfterProcess = []
+    lines = []
+    for line in s.strip().split('\n'):
+        if line.strip() != '':
+            lines.append(line.strip())
+    if len(lines) <= 1:
+        strAfterProcess.append("Chuỗi đầu vào là chuỗi rỗng!!!")
+        return strAfterProcess
     for i in range(len(lines)):
         #Thêm khoảng trắng giữa dấu +, - và biến, ví dụ 3x+2y => 3x + 2y 
         lines[i] = re.sub(r'([^\s])([+-])', r'\1 \2', lines[i])
         #Đảm bảo luôn có khoảng trắng giữa biến và dấu so sánh
         lines[i] = re.sub(r'(<=|>=|=)(\w+)', r'\1 \2', lines[i])
         lines[i] = re.sub(r'(\w+)(<=|>=|=)', r'\1 \2', lines[i])
+    #kiểm tra định dạng
+    matchAimFunction = re.match(r'^(max|min)\s+([+-]?\s*\d*\s*[a-z]\d*)(\s*[+-]\s*\d*\s*[a-z]\d*)*$', lines[0].strip())
+    if not matchAimFunction: #ko đúng định dạng hàm mục tiêu
+        strAfterProcess.append("Hàm mục tiêu không đúng định dạng!!!")
+        return strAfterProcess
+    #xử lý trường hợp các ràng buộc không đúng định dạng
+    for i in range(1, len(lines)):
+        checkConstraintForm = re.match(r'^\s*[+-]?\s*\d*\s*[a-z]\d*\s*(?:[+-]\s*\d*\s*[a-z]\d*\s*)*\s*(<=|>=|=)\s*[-+]?\d+(?:\.\d+)?\s*$', lines[i])
+        if not checkConstraintForm:
+            strAfterProcess.append("Ràng buộc không đúng định dạng!!!")
+            return strAfterProcess
     #tách ra từng phân tử trong 1 mảng để xử lý
     for line in lines:
         cutStr = line.strip()
@@ -35,7 +50,6 @@ def inputStringProcessing(s):
     firstWord = (firstLine.split())[0]
     originFirstWord = firstWord
     linesProcessing[0] = (linesProcessing[0].replace(firstWord, '')).strip()
-
     boundedVars = set()
     for k in range(len(linesProcessing)):
         temp = linesProcessing[k].split()
@@ -80,6 +94,10 @@ def inputStringProcessing(s):
             # tạo đầy đủ hệ số theo biến X đã biết
             coefs = [coefs.get(var, 0) for var in X]
             A.append(coefs)
+    #Kiểm tra xem có bao nhiêu biến rồi xử lý tiếp, bài toán cần ít nhất 2 biến trở lên
+    if len(X) < 2: 
+        strAfterProcess.append("Bài toán phải có  2 biến trở lên!!!")
+        return strAfterProcess
     constrainedVars = set()
     for k, comp in enumerate(compare):
         if comp in ('>=', '<=') and B[k] == 0:
@@ -91,6 +109,5 @@ def inputStringProcessing(s):
     for var in X:
         if var not in constrainedVars:
             freeVar.append(var)
-
-
-
+    strAfterProcess = linesProcessing
+    return strAfterProcess
