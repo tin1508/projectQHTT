@@ -219,16 +219,23 @@ class Ui_MainWindow(object):
                 s = self.receiveInputFromUser()
                 Xu_Ly_Dau_Vao.inputStringProcessing(s)
                 equation = Chuan_Tac.returnFormToSolveSimplexAndBland()
-                #varVec = Chuan_Tac.X
+                varVec = Chuan_Tac.X
                 condition = Xu_Ly_Dau_Vao.firstWord
-                #checkBCoef = Chuan_Tac.newB
-
+                BCoefs = Chuan_Tac.newB
+                checkBcoefs = True
+                for b in BCoefs:
+                    if b < 0:
+                        checkBcoefs = False
+                        break
                 if method == "Phương pháp Đơn hình":
-                    DonHinh_Bland_2Pha.solveSymplex(equation, condition, outputCall = self.outputCall)
+                    if checkBcoefs == False: self.resultTextEdit.setText("Phương pháp đơn hình chỉ giải cho bài toán có hệ số b >= 0!!!")
+                    else: DonHinh_Bland_2Pha.solveSymplex(equation, condition, outputCall = self.outputCall, varVec)
                 elif method == "Phương pháp Bland" :
-                    DonHinh_Bland_2Pha.solveBland(equation, condition, outputCall = self.outputCall)            
+                    if checkBcoefs == False: self.resultTextEdit.setText("Phương pháp bland chỉ giải cho bài toán có hệ số b >= 0!!!")
+                    else: DonHinh_Bland_2Pha.solveBland(equation, condition, outputCall = self.outputCall, varVec)            
                 else:
-                    DonHinh_Bland_2Pha.solveTwoPhaseSymplex(equation, condition, outputCall = self.outputCall)
+                    if checkBcoefs == True: self.resultTextEdit.setText("Phương pháp 2 pha giải cho bài toán có hệ số b < 0!!!")
+                    else: DonHinh_Bland_2Pha.solveTwoPhaseSymplex(equation, condition, outputCall = self.outputCall, varVec)
             else:
                 self.resultTextEdit.setPlainText("Vui lòng chọn phương pháp giải!!!!");
     #hàm này dùng để in kết quả đơn hình, bland, 2 pha ra result text
