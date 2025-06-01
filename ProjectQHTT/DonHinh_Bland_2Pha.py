@@ -1,11 +1,12 @@
 #code chức năng
 import copy
+import re
 #Dieu kien dau vao
-def getSymplex(equation, condition):
+def getSymplex(equation, varVec, condition):
     size_col = max(len(equation[i]) for i in range(len(equation)))
     size_row = len(equation)
     variables = [
-        "b"  if i == 0 else f"x" + chr(0x2080 + i) 
+        "b"  if i == 0 else varVec[i - 1] 
         for i in range(size_col)
     ]
     Lefts = [
@@ -32,7 +33,7 @@ def returnEquation(symplex):
         terms = []
         for coef, var in zip(right[1:], variables[1:]):
             if coef == 0:
-                terms.append("     ")  
+                terms.append("      ")  
             else:
                 sign = "+" if coef > 0 else "-"
                 coef_abs = abs(coef)
@@ -46,7 +47,6 @@ def returnEquation(symplex):
         rhs = " ".join(terms)
         result.append(f"{left} = {b:.2f}{' ' + rhs if rhs else ''}")
     return '\n'.join(result)
-
 def findMinVariable(symplex):
     equation = symplex["Equation"][0]["Right"]
     min_value = min(equation[1:])
@@ -145,9 +145,9 @@ def result(symplex, condition, outputCall):
         outputCall(f"{symplex["Variable"][i]} : {0}")
 
 #Symplex
-def solveSymplex(equation, condition, outputCall):
+def solveSymplex(equation, condition, varVec, outputCall):
     outputCall("Symplex")
-    symplex = getSymplex(equation, condition)
+    symplex = getSymplex(equation, varVec, condition)
     outputCall(returnEquation(symplex))
     while True:
         if ifinitySolution(symplex, outputCall):
@@ -188,9 +188,9 @@ def findMinVariableBland(symplex):
     if w_indices:
         return min(w_indices)
     return None
-def solveBland(equation, condition, outputCall):
+def solveBland(equation, condition, varVec, outputCall):
     outputCall("Bland")
-    symplex = getSymplex(equation, condition)
+    symplex = getSymplex(equation, varVec, condition)
     outputCall(returnEquation(symplex))
     while True:
         if ifinitySolution(symplex, outputCall):
@@ -215,38 +215,30 @@ def solveBland(equation, condition, outputCall):
         symplex = rotate(symplex, min_indexGetMin, min_indexGetDivine)
         outputCall(returnEquation(symplex))
 #Phase One
-def subscript_to_int(subscript_str):
-    # Bảng chuyển ký tự subscript sang số thường
+def get_index_from_var(var):
+    # Tìm số thường liền sau x (vd: x1, x12)
+    match = re.match(r'x(\d+)', var)
+    if match:
+        return int(match.group(1))
+    # Nếu không có, thì thử tìm số subscript như trước
     subscript_map = {
-        '₀': '0',
-        '₁': '1',
-        '₂': '2',
-        '₃': '3',
-        '₄': '4',
-        '₅': '5',
-        '₆': '6',
-        '₇': '7',
-        '₈': '8',
-        '₉': '9'
+        '₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4',
+        '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9'
     }
-    result = ''
-    for ch in subscript_str:
-        if ch in subscript_map:
-            result += subscript_map[ch]
-        else:
-            # nếu có ký tự không phải subscript thì bỏ qua hoặc xử lý tùy ý
-            pass
-    return int(result) if result else -1
+    subscript_chars = ''.join(ch for ch in var if ch in subscript_map)
+    if subscript_chars:
+        return int(''.join(subscript_map[ch] for ch in subscript_chars))
+    return -1
 def get_subscript_index(var):
     # Lấy phần chỉ số unicode subscript của biến
     # Ví dụ: var = 'x₁₀' -> lấy '₁₀'
     subscript_part = var[1:]  # cắt bỏ chữ 'x'
-    return subscript_to_int(subscript_part)
-def getPhaseOne(equation, condition):
+    return get_index_from_var(var)
+def getPhaseOne(equation, varVec, condition):
     size_col = max(len(equation[i]) for i in range(len(equation)))
     size_row = len(equation)
     variables = [
-        "b"  if i == 0 else f"x" + chr(0x2080 + i) 
+        "b"  if i == 0 else varVec[i - 1] 
         for i in range(size_col)
     ]  + ["x" + chr(0x2080 + 0)]
     Lefts = [
@@ -269,12 +261,13 @@ def getPhaseOne(equation, condition):
         ]
     }
     return symplex
-def solveTwoPhaseSymplex(equation, condition, outputCall):
+def solveTwoPhaseSymplex(equation, condition, varVec,  outputCall):
     #Pha 1
     size_col = max(len(equation[i]) for i in range(len(equation)))
     size_row = len(equation)
-    copy_symplex = copy.deepcopy(equation[0])
-    symplex = getPhaseOne(equation, condition)
+    copySymplex = getSymplex(equation, varVec, condition)
+    copy_symplex = copy.deepcopy(copySymplex)
+    symplex = getPhaseOne(equation, varVec, condition)
     outputCall(returnEquation(symplex))
     #min_indexGetMin
     min_indexGetMin = size_col
@@ -339,11 +332,14 @@ def solveTwoPhaseSymplex(equation, condition, outputCall):
                 varList.append(var)
                 equa.append(array)
         varEquaPairs = list(zip(varList, equa))
-        varEquaPairsSorted = sorted(varEquaPairs, key=lambda pair: get_subscript_index(pair[0]))
+        varEquaPairsSorted = sorted(varEquaPairs, key=lambda pair: (
+            get_subscript_index(pair[0]),
+            0 if '⁺' in pair[0] else 1 if '⁻' in pair[0] else 2
+        ))
         varSorted = [pair[0] for pair in varEquaPairsSorted]
         equaSorted = [pair[1] for pair in varEquaPairsSorted]
         z = [0] * size_col
-        for right, equa in zip(copy_symplex[1:], equaSorted):
+        for right, equa in zip(copy_symplex["Equation"][0]["Right"][1:], equaSorted):
             z = [zj + right * ej for zj, ej in zip(z, equa)]
         indexX0 = -1
         for i, var in enumerate(symplex["Variable"]):
@@ -354,8 +350,8 @@ def solveTwoPhaseSymplex(equation, condition, outputCall):
         for equa in symplex["Equation"]:
             equa["Right"][indexX0] = 0
         symplex["Variable"].pop(indexX0)
-        for eq in symplex["Equation"]:
-            eq["Right"].pop(indexX0)
+        for equa in symplex["Equation"]:
+            equa["Right"].pop(indexX0)
         #Phase Two
         outputCall("Phase Two")
         outputCall("Symplex")

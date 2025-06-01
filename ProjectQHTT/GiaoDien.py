@@ -229,13 +229,13 @@ class Ui_MainWindow(object):
                         break
                 if method == "Phương pháp Đơn hình":
                     if checkBcoefs == False: self.resultTextEdit.setText("Phương pháp đơn hình chỉ giải cho bài toán có hệ số b >= 0!!!")
-                    else: DonHinh_Bland_2Pha.solveSymplex(equation, condition, outputCall = self.outputCall, varVec)
+                    else: DonHinh_Bland_2Pha.solveSymplex(equation, condition, varVec, outputCall = self.outputCall)
                 elif method == "Phương pháp Bland" :
                     if checkBcoefs == False: self.resultTextEdit.setText("Phương pháp bland chỉ giải cho bài toán có hệ số b >= 0!!!")
-                    else: DonHinh_Bland_2Pha.solveBland(equation, condition, outputCall = self.outputCall, varVec)            
+                    else: DonHinh_Bland_2Pha.solveBland(equation, condition, varVec, outputCall = self.outputCall)            
                 else:
                     if checkBcoefs == True: self.resultTextEdit.setText("Phương pháp 2 pha giải cho bài toán có hệ số b < 0!!!")
-                    else: DonHinh_Bland_2Pha.solveTwoPhaseSymplex(equation, condition, outputCall = self.outputCall, varVec)
+                    else: DonHinh_Bland_2Pha.solveTwoPhaseSymplex(equation, condition, varVec, outputCall = self.outputCall)
             else:
                 self.resultTextEdit.setPlainText("Vui lòng chọn phương pháp giải!!!!");
     #hàm này dùng để in kết quả đơn hình, bland, 2 pha ra result text
