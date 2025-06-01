@@ -180,8 +180,7 @@ def solve(aimText, constraintText, outputCall, axes, canvas):
     else:
         c1 = float(c1_str)
 
-    # Handle coefficient for x2
-    c2_str = c2_str.replace(" ", "")  # Remove any spaces
+    c2_str = c2_str.replace(" ", "")  
     if c2_str == "-":
         c2 = -1.0
     elif c2_str == "+" or c2_str == "":
@@ -192,7 +191,6 @@ def solve(aimText, constraintText, outputCall, axes, canvas):
         c2 = -c2
     c = [c1, c2]
 
-    # Parse constraints
     constraints = []
     for line in constraint_lines:
         match_full = re.match(r"([-+]?\s*\d*\.?\d*)?x1\s*([-+])\s*([-+]?\s*\d*\.?\d*)?x2\s*(<=|>=|=)\s*([-\d.]+)", line)
@@ -259,7 +257,7 @@ def solve(aimText, constraintText, outputCall, axes, canvas):
         plotFeasibleRegion(constraints, vertices, [], False, False, None, c, objective, axes, canvas)
         return
 
-
+    result_text = ""
     if is_infinite:
         result_text = f"Giá trị tối {'đa' if objective == 'max' else 'thiểu'} Z = {result:.2f}\n"
         result_text += "Kết quả: Vô số nghiệm\n"
@@ -274,12 +272,12 @@ def solve(aimText, constraintText, outputCall, axes, canvas):
             [f"({x1:.2f}, {x2:.2f})" for x1, x2 in optimal_points]
         )
 
-    result_text += "\n\nTất cả các đỉnh và Z tương ứng:\n" + "\n".join([
+    if values is not None:
+        result_text += "\n\nTất cả các đỉnh và Z tương ứng:\n" + "\n".join([
         f"({x1:.2f}, {x2:.2f}) -> Z = {val:.2f}" for (x1, x2), val in zip(vertices, values)
     ])
+
     outputCall(result_text)
-    result = solve_linear_programming(constraints, c, objective)
-    optimal_value, optimal_points, vertices, values, is_infinite, optimal_points, is_unbounded, unbounded_points = result
 
+    # No need to re-call solve_linear_programming again!
     plotFeasibleRegion(constraints, vertices, optimal_points, is_infinite, is_unbounded, unbounded_points, c, objective, axes, canvas)
-

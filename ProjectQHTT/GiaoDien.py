@@ -206,11 +206,14 @@ class Ui_MainWindow(object):
         else:
             #Phương pháp hình học tọa độ
             if method == "Phương pháp Hình học (cho 2 biến, dùng tọa độ)":
-                aimText = self.objectiveLineEdit.text()
-                constraintText = self.constraintsPlainTextEdit.toPlainText()
-                axes = self.SetUpEmptyPlot()
-                HinhHoc_ToaDo.solve(aimText, constraintText, outputCall= self.outputCall, axes = axes, canvas = self.canvas)
-                self.canvas.draw()
+                if len(Xu_Ly_Dau_Vao.X) > 2:
+                    self.resultTextEdit.setText("Phương pháp hình học chỉ dùng cho bài toán 2 biến!!!")
+                else:
+                    aimText = self.objectiveLineEdit.text()
+                    constraintText = self.constraintsPlainTextEdit.toPlainText()
+                    axes = self.SetUpEmptyPlot()
+                    HinhHoc_ToaDo.solve(aimText, constraintText, outputCall= self.outputCall, axes = axes, canvas = self.canvas)
+                    self.canvas.draw()
             #Phương pháp đơn hình, bland, 2 pha
             elif method == "Phương pháp Đơn hình" or method == "Phương pháp Bland" or method == "Phương pháp Hai pha":
                 s = self.receiveInputFromUser()
@@ -236,9 +239,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         #Kích thước mặc định khi chạy ứng dụng
-        self.resize(1200,800)  
+        self.resize(1000,800)  
         # Kích thước tối thiểu
-        self.setMinimumSize(500,400)
+        self.setMinimumSize(400,300)
         self.setWindowIcon(QIcon("logo.png"))
 
 def showProgram():

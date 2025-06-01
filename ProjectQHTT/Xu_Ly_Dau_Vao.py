@@ -22,7 +22,7 @@ def inputStringProcessing(s):
         if line.strip() != '':
             lines.append(line.strip())
     if len(lines) <= 1:
-        strAfterProcess.append("Chuỗi đầu vào là chuỗi rỗng!!!")
+        strAfterProcess.append("Bài toán không hợp lệ!!!")
         return strAfterProcess
     for i in range(len(lines)):
         #Thêm khoảng trắng giữa dấu +, - và biến, ví dụ 3x+2y => 3x + 2y 
