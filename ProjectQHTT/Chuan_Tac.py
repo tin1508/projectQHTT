@@ -16,13 +16,13 @@ def changeIntoStandardForm():
     if len(c) < len(X):
         # Thêm hệ số 0 cho các biến còn thiếu trong hàm mục tiêu
         missVar = len(X) - len(c)
-        for _ in range(missVar):
-            c.append(0)
+        for i in range(missVar):
+            c.append(0.0)
     result = []
     if firstWord == 'max':
         firstWord = '-min'
         for i in range(len(c)):
-            c[i] = c[i] * (-1)
+            c[i] = c[i] * (-1.0)
     # xử lý biến tự do
     for var in freeVar:
         if var in X:
@@ -52,18 +52,18 @@ def changeIntoStandardForm():
     # xử lý các ràng buộc
     for i in range(len(compare)):
         row = A[i]
-        bValue = int(B[i])
+        bValue = float(B[i])
         comp = compare[i]
         if len(row) > 1:
             if comp == '>=':
                 bValue *= -1
-                row = [-x for x in row]
+                row = [-float(x) for x in row]
                 comp = '<='
             if comp == '=':
                 newA.append(row[:])
                 newB.append(bValue)
                 newCompare.append('<=')
-                newA.append([-x for x in row])
+                newA.append([-float(x) for x in row])
                 newB.append(-bValue)
                 newCompare.append('<=')
                 continue

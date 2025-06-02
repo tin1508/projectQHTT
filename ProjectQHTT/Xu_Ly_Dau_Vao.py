@@ -31,13 +31,13 @@ def inputStringProcessing(s):
         lines[i] = re.sub(r'(<=|>=|=)(\w+)', r'\1 \2', lines[i])
         lines[i] = re.sub(r'(\w+)(<=|>=|=)', r'\1 \2', lines[i])
     #kiểm tra định dạng
-    matchAimFunction = re.match(r'^(max|min)\s+([+-]?\s*\d*\s*[a-z]\d*)(\s*[+-]\s*\d*\s*[a-z]\d*)*$', lines[0].strip())
+    matchAimFunction = re.match(r'^(max|min)\s+([+-]?\s*\d*(?:\.\d+)?\s*[a-z]\d+)(\s*[+-]\s*\d*(?:\.\d+)?\s*[a-z]\d+)*$',lines[0].strip())
     if not matchAimFunction: #ko đúng định dạng hàm mục tiêu
         strAfterProcess.append("Hàm mục tiêu không đúng định dạng!!!")
         return strAfterProcess
     #xử lý trường hợp các ràng buộc không đúng định dạng
     for i in range(1, len(lines)):
-        checkConstraintForm = re.match(r'^\s*[+-]?\s*\d*\s*[a-z]\d*\s*(?:[+-]\s*\d*\s*[a-z]\d*\s*)*\s*(<=|>=|=)\s*[-+]?\d+(?:\.\d+)?\s*$', lines[i])
+        checkConstraintForm = re.match(r'^([+-]?\s*\d*(?:\.\d+)?\s*[a-zA-Z]\d*\s*)+(<=|>=|=)\s*[-+]?\d+(?:\.\d+)?\s*$',lines[i])
         if not checkConstraintForm:
             strAfterProcess.append("Ràng buộc không đúng định dạng!!!")
             return strAfterProcess
@@ -74,17 +74,17 @@ def inputStringProcessing(s):
             else:
                 if i > 0 and temp[i - 1] in ('+', '-'):
                     j = temp[i - 1] + j
-                match = re.match(r'([+-]?\d*)([a-z]\w*)', j)
+                match = re.match(r'([+-]?\s*\d*(?:\.\d+)?)([a-z]\d*)', j)
                 if match:
                     coefStr, var = match.groups()
                     if(coefStr in ('', '+')):
-                        coef = 1
+                        coef = 1.0
                     elif(coefStr == '-'):
-                        coef = -1
+                        coef = -1.0
                     else:
-                        coef = int(coefStr)
+                        coef = float(coefStr)
                     if(k == 0):
-                        c.append(coef)
+                        c.append(float(coef))
                     else:
                         coefs[var] = coef
                     if(var not in X):
@@ -92,7 +92,7 @@ def inputStringProcessing(s):
         # Nếu là ràng buộc, không phải dòng hàm mục tiêu
         if k != 0 and coefs:
             # tạo đầy đủ hệ số theo biến X đã biết
-            coefs = [coefs.get(var, 0) for var in X]
+            coefs = [coefs.get(var, 0.0) for var in X]
             A.append(coefs)
     #Kiểm tra xem có bao nhiêu biến rồi xử lý tiếp, bài toán cần ít nhất 2 biến trở lên
     if len(X) < 2 or len(c) < 2: 
@@ -100,7 +100,7 @@ def inputStringProcessing(s):
         return strAfterProcess
     constrainedVars = set()
     for k, comp in enumerate(compare):
-        if comp in ('>=', '<=') and B[k] == 0:
+        if comp in ('>=', '<=') and float(B[k]) == 0:
             for i, coef in enumerate(A[k]):
                 if coef != 0:
                     constrainedVars.add(X[i])    
@@ -109,5 +109,5 @@ def inputStringProcessing(s):
     for var in X:
         if var not in constrainedVars:
             freeVar.append(var)
-    strAfterProcess = linesProcessing
-    return strAfterProcess
+    linesProcessing
+    return linesProcessing

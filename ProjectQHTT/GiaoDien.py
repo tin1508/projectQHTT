@@ -197,6 +197,7 @@ class Ui_MainWindow(object):
     #các phương pháp giải bài toán quy hoạch tuyến tính chuẩn
     def solveProblemBySolutions(self):
         self.resultTextEdit.clear()
+        axes = self.SetUpEmptyPlot()
         method = self.methodComboBox.currentText()
         s = self.receiveInputFromUser()
         #xử lý chuỗi đầu vào
@@ -211,7 +212,6 @@ class Ui_MainWindow(object):
                 else:
                     aimText = self.objectiveLineEdit.text()
                     constraintText = self.constraintsPlainTextEdit.toPlainText()
-                    axes = self.SetUpEmptyPlot()
                     HinhHoc_ToaDo.solve(aimText, constraintText, outputCall= self.outputCall, axes = axes, canvas = self.canvas)
                     self.canvas.draw()
             #Phương pháp đơn hình, bland, 2 pha

@@ -3,7 +3,6 @@ import matplotlib.pyplot as ax
 from itertools import combinations
 import re
 
-# ======== Logic giải bài toán QHTT ========
 
 def find_intersection(line1, line2):
     A = np.array([line1[:2], line2[:2]])
@@ -114,7 +113,7 @@ def plotFeasibleRegion(constraints, vertices, optimal_points, is_infinite, is_un
         # Vẽ miền nghiệm
         hull = vertices[np.argsort(np.arctan2(vertices[:, 1] - vertices[:, 1].mean(),
                                               vertices[:, 0] - vertices[:, 0].mean()))]
-        axes.fill(hull[:, 0], hull[:, 1], 'lightblue', alpha=0.5, label="Miền nghiệm khả thi")
+        axes.fill(hull[:, 0], hull[:, 1], '#1f77b4', alpha=0.5, label="Miền nghiệm khả thi")
         axes.plot(vertices[:, 0], vertices[:, 1], 'ro', label="Đỉnh")
 
         if is_unbounded:
@@ -265,7 +264,10 @@ def solve(aimText, constraintText, outputCall, axes, canvas):
             [f"({x1:.2f}, {x2:.2f})" for x1, x2 in optimal_points[:2]]
         )
     elif is_unbounded:
-        result_text = "Miền nghiệm không bị chặn (vô nghiệm với mục tiêu ràng buộc)\n"
+        if objective == 'min':
+            result_text = "Bài toán không giới nội, min z = -inf\n"
+        else:
+            result_text = "Bài toán không giới nội, max z = inf\n"
     else:
         result_text = f"Giá trị tối {'đa' if objective == 'max' else 'thiểu'} Z = {result:.2f}\n"
         result_text += "\nCác điểm tối ưu:\n" + "\n".join(

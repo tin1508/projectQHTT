@@ -24,7 +24,7 @@ def changeIntoAugmentedForm():
                 count = count + 1
                 comp = '='
             else:
-                newW.append('0')
+                newW.append('0.0')
             newCompare.append(comp)
     #xuất ra output dạng chuỗi
     #hàm mục tiêu
@@ -32,13 +32,9 @@ def changeIntoAugmentedForm():
     for i in range(1, len(c)):
         if c[i] == 0: continue
         if c[i] > 0:
-            temp1 = temp1 + '+ ' + str(c[i]) + X[i] + ' '
-        elif c[i] == 1:
-            temp1 = temp1 + '+ ' + X[i] + ' '
-        elif c[i] == -1:
-            temp1 = temp1 + '- ' + X[i] + ' '
-        else:
-            temp1 = temp1 + str(c[i])[:1] + ' ' + str(c[i])[1:] + X[i] + ' '
+            temp1 = temp1 + '+ ' + str(c[i]) + X[i] + ' '; 
+        elif c[i] < 0:
+            temp1 = temp1 + str(c[i])[:1] + ' ' + str(c[i])[1:] + X[i] + ' ';
     result.append(firstWord + ' ' + temp1)
     #các ràng buộc
     for i in range(len(A)):
