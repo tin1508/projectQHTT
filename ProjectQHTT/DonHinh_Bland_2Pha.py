@@ -305,7 +305,7 @@ def solveTwoPhaseSymplex(equation, condition, varVec,  outputCall):
         index_x0 = symplex["Variable"].index("x₀")  # tìm vị trí x₀
     except ValueError:
         outputCall("Không tìm thấy biến x₀")
-        outputCall("Bai toan vo nghiem")
+        outputCall("Bài toán vô nghiệm")
         return 
     checkEquation = True
     for i, value in enumerate(symplex["Equation"][0]["Right"]):
@@ -338,6 +338,12 @@ def solveTwoPhaseSymplex(equation, condition, varVec,  outputCall):
         ))
         varSorted = [pair[0] for pair in varEquaPairsSorted]
         equaSorted = [pair[1] for pair in varEquaPairsSorted]
+        for i, equa in enumerate(equaSorted):
+            if all(x == 0 for x in equa):
+                indexX = symplex["Variable"].index(varSorted[i])
+                equa[indexX] = 1
+        outputCall(str(varSorted))
+        outputCall(str(equaSorted))
         z = [0] * size_col
         for right, equa in zip(copy_symplex["Equation"][0]["Right"][1:], equaSorted):
             z = [zj + right * ej for zj, ej in zip(z, equa)]
@@ -353,8 +359,9 @@ def solveTwoPhaseSymplex(equation, condition, varVec,  outputCall):
         for equa in symplex["Equation"]:
             equa["Right"].pop(indexX0)
         #Phase Two
-        outputCall("Phase Two")
-        outputCall("Symplex")
+        outputCall("-------------------------------------")
+        outputCall("Pha hai")
+        outputCall("Dùng đơn hình")
         outputCall(returnEquation(symplex))
         while True:
             if ifinitySolution(symplex, outputCall):
@@ -379,7 +386,7 @@ def solveTwoPhaseSymplex(equation, condition, varVec,  outputCall):
             symplex = rotate(symplex, min_indexGetMin, min_indexGetDivine)
             outputCall(returnEquation(symplex))
     else:
-        outputCall("Bai toan vo nghiem")
+        outputCall("Bài toán vô nghiệm")
     return symplex
 
             
