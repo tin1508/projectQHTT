@@ -66,20 +66,19 @@ def findMinDivine(symplex, min_indexGetMin):
         return None
     min_row = min(result, key=lambda x: x[1])[0]
     return min_row
-def ifinitySolution(symplex, outputCall):
+def  infinitySolution(symplex, condition, outputCall):
     Right = symplex["Equation"][0]["Right"]
-    checkValue = all(value >= 0 for value in Right)
+    checkValue = all(value >= 0 for value in Right[1:])
     for i in range(1, len(Right)):
         if Right[i] == 0 and checkValue:
-            outputCall(f"Boi vi he so {symplex["Variable"][i]} = {Right[i]:.0f}")
-            variables = symplex["Variable"]
-            index = symplex["Equation"][0]["Right"].index(0)
-            symplex["Variable"].pop(index)
-            for eq in symplex["Equation"]:
-                eq["Right"].pop(index)
-            for i in range(1, len(symplex["Equation"][0]["Right"])):
-                symplex["Equation"][0]["Right"][i] = 0
-            outputCall(returnEquation(symplex))
+            outputCall(f"Bởi vì hệ số {symplex["Variable"][i]} = {Right[i]:.0f}")
+            size_row = len(symplex["Equation"])
+            size_col = len(symplex["Equation"][0]["Right"])
+            for i in range(size_row):
+                if symplex["Equation"][i]["Left"] == "z" and condition == "max":
+                    outputCall(f"{symplex["Equation"][i]["Left"]} : {-symplex["Equation"][i]["Right"][0]:.2f}")
+                elif symplex["Equation"][i]["Left"] == "z" and condition == "min":
+                    outputCall(f"{symplex["Equation"][i]["Left"]} : {symplex["Equation"][i]["Right"][0]:.2f}")
             #Xu ly dau
             size_col = len(symplex["Equation"][0]["Right"])
             if size_col == 2:
@@ -150,7 +149,7 @@ def solveSymplex(equation, condition, varVec, outputCall):
     symplex = getSymplex(equation, varVec, condition)
     outputCall(returnEquation(symplex))
     while True:
-        if ifinitySolution(symplex, outputCall):
+        if  infinitySolution(symplex, condition, outputCall):
             outputCall("Vô số nghiệm")
             break
         if stopSymplex(symplex):
@@ -193,7 +192,7 @@ def solveBland(equation, condition, varVec, outputCall):
     symplex = getSymplex(equation, varVec, condition)
     outputCall(returnEquation(symplex))
     while True:
-        if ifinitySolution(symplex, outputCall):
+        if  infinitySolution(symplex, condition, outputCall):
             outputCall("vô số nghiệm")
             break
         if stopSymplex(symplex):
@@ -330,7 +329,7 @@ def solveTwoPhaseSymplex(equation, condition, varVec,  outputCall):
         for var in symplex["Variable"]:
             if var.startswith('x')  and var != f"x" + chr(0x2080 + 0):
                 varList.append(var)
-                equa.append(array)
+                equa.append(array.copy())
         varEquaPairs = list(zip(varList, equa))
         varEquaPairsSorted = sorted(varEquaPairs, key=lambda pair: (
             get_subscript_index(pair[0]),
@@ -339,11 +338,9 @@ def solveTwoPhaseSymplex(equation, condition, varVec,  outputCall):
         varSorted = [pair[0] for pair in varEquaPairsSorted]
         equaSorted = [pair[1] for pair in varEquaPairsSorted]
         for i, equa in enumerate(equaSorted):
-            if all(x == 0 for x in equa):
-                indexX = symplex["Variable"].index(varSorted[i])
+            if all(abs(x) < 1e-8 for x in equa):  
+                indexX = symplex["Variable"].index(varSorted[i])        
                 equa[indexX] = 1
-        outputCall(str(varSorted))
-        outputCall(str(equaSorted))
         z = [0] * size_col
         for right, equa in zip(copy_symplex["Equation"][0]["Right"][1:], equaSorted):
             z = [zj + right * ej for zj, ej in zip(z, equa)]
@@ -364,7 +361,7 @@ def solveTwoPhaseSymplex(equation, condition, varVec,  outputCall):
         outputCall("Dùng đơn hình")
         outputCall(returnEquation(symplex))
         while True:
-            if ifinitySolution(symplex, outputCall):
+            if  infinitySolution(symplex, condition, outputCall):
                 outputCall("Vô số nghiệm")
                 break
             if stopSymplex(symplex):
