@@ -222,19 +222,25 @@ class Ui_MainWindow(object):
                 varVec = Chuan_Tac.X
                 condition = Xu_Ly_Dau_Vao.firstWord
                 BCoefs = Chuan_Tac.newB
-                checkBcoefs = True
+                solution = ''
                 for b in BCoefs:
                     if b < 0:
-                        checkBcoefs = False
+                        solution = '2 Pha'
+                        break
+                    elif b == 0:
+                        solution = 'Bland'
+                        break
+                    else:
+                        solution = 'Don Hinh'
                         break
                 if method == "Phương pháp Đơn hình":
-                    if checkBcoefs == False: self.resultTextEdit.setText("Phương pháp đơn hình chỉ giải cho bài toán có hệ số b >= 0!!!")
+                    if solution == 'Bland' or solution == '2 Pha': self.resultTextEdit.setText("Phương pháp đơn hình chỉ giải cho bài toán có hệ số b > 0!!!")
                     else: DonHinh_Bland_2Pha.solveSymplex(equation, condition, varVec, outputCall = self.outputCall)
                 elif method == "Phương pháp Bland" :
-                    if checkBcoefs == False: self.resultTextEdit.setText("Phương pháp bland chỉ giải cho bài toán có hệ số b >= 0!!!")
+                    if solution == 'Don Hinh' or solution == '2 Pha': self.resultTextEdit.setText("Phương pháp bland chỉ giải cho bài toán có hệ số b = 0!!!")
                     else: DonHinh_Bland_2Pha.solveBland(equation, condition, varVec, outputCall = self.outputCall)            
                 else:
-                    if checkBcoefs == True: self.resultTextEdit.setText("Phương pháp 2 pha giải cho bài toán có hệ số b < 0!!!")
+                    if solution == 'Don Hinh' or solution == 'Bland': self.resultTextEdit.setText("Phương pháp 2 pha giải cho bài toán có hệ số b < 0!!!")
                     else: DonHinh_Bland_2Pha.solveTwoPhaseSymplex(equation, condition, varVec, outputCall = self.outputCall)
             else:
                 self.resultTextEdit.setPlainText("Vui lòng chọn phương pháp giải!!!!");

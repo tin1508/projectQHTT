@@ -68,9 +68,8 @@ def inputStringProcessing(s):
         coefs = {}
         for i, j  in enumerate(temp):
             if j in ('>=', '<=', '='):
-                if temp[i + 1] != '0':
-                    B.append(temp[i + 1])
-                    compare.append(j)
+                B.append(float(temp[i + 1]))
+                compare.append(j)
             else:
                 if i > 0 and temp[i - 1] in ('+', '-'):
                     j = temp[i - 1] + j
