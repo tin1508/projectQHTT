@@ -3,9 +3,9 @@ The project is a desktop application designed to solve problems relating to Line
 
 ## 📌 Table of Contents
 * [Key Features](#key-features)
-* [Tech Stack](#tech-stack)
+* [Tech Stack](#%EF%B8%8Ftech-stack)
 * [Which problems does the program handle?](#which-problems-does-the-program-handle)
-* [How to set up the program](#how-to-set-up-the-program)
+* [How to set up the program](#%EF%B8%8Fhow-to-set-up-the-program)
 * [Collaborators](#collaborators)
 
 ## 🚀Key Features
