@@ -2,11 +2,11 @@
 The project is a desktop application designed to solve problems relating to Linear Programming mathematical model. It provides an efficient and structured way to input complex mathematical constraints, run optimization algorithm, and output actionable, optimal solutions for decision-making scenarios.
 
 ## 📌 Table of Contents
-* [Key Features](#-key-features)
-* [Tech Stack](#%EF%B8%8F-tech-stack)
-* [Technical Deep Dive](#-technical-deep-dive)
-* [Getting Started](#-getting-started)
-* [Collaborators](#-collaborators)
+* [Key Features](#key-features)
+* [Tech Stack](#tech-stack)
+* [Which problem does the program handle?](#which-problem-does-the-program-handle)
+* [How to set up the program](#how-to-set-up-the-program)
+* [Collaborators](#collaborators)
 
 ## 🚀 Key Features
 * **Standard & Canonical Forms:** Automatically converts user-inputted linear programming problems into their Standard or Canonical forms, which is a required prerequisite for algorithmic solving.
